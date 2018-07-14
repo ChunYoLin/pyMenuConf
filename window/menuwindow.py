@@ -19,12 +19,21 @@ class menuwindow(window):
     def prewin(self):
         return self.__prewin
 
+    @prewin.getter
+    def prewin(self):
+        return self.__prewin
+
     @prewin.setter 
     def prewin(self, win):
         self.__prewin = win
 
     def add_subwin(self, item, win):
         self.subwin[item] = win
+
+    def get_subwin(self):
+        subwin_key = self.items[self.cur_cursor]
+        subwin = self.subwin[subwin_key]
+        return subwin
 
     def draw(self):
         self.win.clear()
@@ -46,10 +55,3 @@ class menuwindow(window):
         else:
             self.cur_cursor = 0
 
-    def get_prewin(self):
-        return self.prewin
-
-    def get_subwin(self):
-        subwin_key = self.items[self.cur_cursor]
-        subwin = self.subwin[subwin_key]
-        return subwin

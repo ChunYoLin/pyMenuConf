@@ -14,7 +14,7 @@ def main(stdscr):
     while True:
         user_input = cur_window.win.getch()
         if user_input == ord('q'):
-             cur_window = cur_window.get_prewin()
+             cur_window = cur_window.prewin
         elif user_input == curses.KEY_DOWN:
             cur_window.down()
         elif user_input == curses.KEY_UP:
