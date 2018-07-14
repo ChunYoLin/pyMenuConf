@@ -6,7 +6,6 @@ class menuwindow(window):
     def __init__(self, win, items):
         super().__init__()
         self.__win = win
-        self.__prewin = None
         self.items = items
         self.subwin = {subwin_key: None for subwin_key in items}
         self.cur_cursor = 0
@@ -14,18 +13,6 @@ class menuwindow(window):
     @property
     def win(self):
         return self.__win
-
-    @property
-    def prewin(self):
-        return self.__prewin
-
-    @prewin.getter
-    def prewin(self):
-        return self.__prewin
-
-    @prewin.setter 
-    def prewin(self, win):
-        self.__prewin = win
 
     def add_subwin(self, item, win):
         self.subwin[item] = win
