@@ -1,7 +1,7 @@
 import sys, os
 import curses
 from curses import wrapper
-from window import menuwindow
+from window import window, menuwindow
 
 
 def main(stdscr):
@@ -10,22 +10,16 @@ def main(stdscr):
     cur_window = menuwindow(stdscr, ["aaaaaa", "bbbbbb"])
     next_window = menuwindow(stdscr, ["ddd", "ccc"])
     cur_window.add_subwin("aaaaaa", next_window)
-    cur_window.draw()
     while True:
-        user_input = cur_window.win.getch()
-        if user_input == ord('q'):
-             cur_window = cur_window.prewin
-        elif user_input == curses.KEY_DOWN:
-            cur_window.down()
-        elif user_input == curses.KEY_UP:
-            cur_window.up()
-        elif user_input == 10:
-            sub_window = cur_window.get_subwin()
-            if sub_window != None:
-                sub_window.prewin = cur_window 
-                cur_window = sub_window
-        if cur_window == None:
+        status = cur_window.main_loop()
+        if status == window.EXIT:
+            pre_window = cur_window.prewin
+            if pre_window:
+                pre_window.main_loop()
             break
-        cur_window.draw()
-            
+        elif status == window.ENTER:
+            sub_window = cur_window.get_subwin()
+            if sub_window:
+                sub_window.prewin = cur_window
+                cur_window = sub_window
 wrapper(main)

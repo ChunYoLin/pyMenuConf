@@ -55,3 +55,18 @@ class menuwindow(window):
         else:
             self.cur_cursor = 0
 
+    def main_loop(self):
+        #  draw the menu
+        self.draw()
+        #  process user input
+        user_input = self.win.getch()
+        if user_input == ord('q'):
+            return self.EXIT
+        elif user_input == 10:
+            return self.ENTER
+        else:
+            if user_input == curses.KEY_DOWN:
+                self.down()
+            elif user_input == curses.KEY_UP:
+                self.up()
+            return self.STAY
