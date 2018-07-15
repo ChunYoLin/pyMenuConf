@@ -7,10 +7,10 @@ from window import window, menuwindow
 def main(stdscr):
     user_input = 0
     curses.curs_set(False)
-    cur_window = menuwindow(stdscr, ["aaaaaa", "bbbbbb"])
+    cur_window = menuwindow(stdscr)
+    cur_window.add_bool(symbol="simulation_platform", default=True, help_str="choose the simulation platform")
+    cur_window.add_bool(symbol="pattern", default=False, help_str="choose the pattern")
     pre_window = []
-    next_window = menuwindow(stdscr, ["ddd", "ccc"])
-    cur_window.add_subwin("aaaaaa", next_window)
     while True:
         status = cur_window.main_loop()
         if status == window.EXIT:

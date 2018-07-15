@@ -2,12 +2,33 @@ import curses
 from window.window import window
 
 
+class boolItem():
+    def __init__(self, symbol, default=False, help_str=""):
+        assert default in [True, False]
+        self.symbol = symbol
+        self.default = default
+        self.help_str = help_str
+        self.choice = self.default
+    
+    def toggle(self):
+        self.choice = not self.choice
+
+    def str(self):
+        #  option string
+        option_str = '[]'
+        if self.choice == True:
+            option_str = '[X]'
+        #  symbol string
+        symbol_str = self.symbol
+        #  help string
+        help_str = self.help_str
+        return "{}  {}          {}".format(option_str, symbol_str, help_str)
+
 class menuwindow(window):
-    def __init__(self, win, items):
+    def __init__(self, win):
         super().__init__()
         self.__win = win
-        self.items = items
-        self.subwin = {subwin_key: None for subwin_key in items}
+        self.items = []
         self.cur_cursor = 0
 
     @property
@@ -15,20 +36,26 @@ class menuwindow(window):
         return self.__win
 
     def add_subwin(self, item, win):
-        self.subwin[item] = win
+        pass
 
     def get_subwin(self):
-        subwin_key = self.items[self.cur_cursor]
-        subwin = self.subwin[subwin_key]
-        return subwin
+        pass
+
+    def add_bool(self, symbol, default=None, help_str=""):
+        item = boolItem(symbol, default, help_str)
+        self.items.append(item)
+
+    def cur_item(self):
+        if self.items:
+            return self.items[self.cur_cursor]
 
     def draw(self):
         self.win.clear()
         for idx, item in enumerate(self.items):
             if idx == self.cur_cursor:
-                self.win.addstr(idx, 0, item, curses.A_REVERSE)
+                self.win.addstr(idx, 0, item.str(), curses.A_REVERSE)
             else:
-                self.win.addstr(idx, 0, item)
+                self.win.addstr(idx, 0, item.str())
 
     def down(self):
         if self.cur_cursor < len(self.items)-1:
@@ -49,8 +76,12 @@ class menuwindow(window):
         user_input = self.win.getch()
         if user_input == ord('q'):
             return self.EXIT
-        elif user_input == 10:
-            return self.ENTER
+        elif user_input == ord('\n'):
+            cur_item = self.cur_item()
+            if type(cur_item) == boolItem:
+                cur_item.toggle()
+            else:
+                return self.ENTER
         else:
             if user_input == curses.KEY_DOWN:
                 self.down()
