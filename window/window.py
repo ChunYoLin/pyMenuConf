@@ -2,7 +2,7 @@ import abc
 import curses
 
 
-class window(metaclass=abc.ABCMeta):
+class Window(metaclass=abc.ABCMeta):
     EXIT = 0
     ENTER = 1
     STAY = 2

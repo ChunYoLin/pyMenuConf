@@ -1,2 +1,2 @@
-from .window import window
-from .menuwindow import menuwindow
+from .window import Window
+from .menuwindow import MenuWindow

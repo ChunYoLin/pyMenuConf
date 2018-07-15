@@ -1,30 +1,9 @@
 import curses
-from window.window import window
+from window.window import Window
+from window.item import BoolItem
 
 
-class boolItem():
-    def __init__(self, symbol, default=False, help_str=""):
-        assert default in [True, False]
-        self.symbol = symbol
-        self.default = default
-        self.help_str = help_str
-        self.choice = self.default
-    
-    def toggle(self):
-        self.choice = not self.choice
-
-    def str(self):
-        #  option string
-        option_str = '[]'
-        if self.choice == True:
-            option_str = '[X]'
-        #  symbol string
-        symbol_str = self.symbol
-        #  help string
-        help_str = self.help_str
-        return "{}  {}          {}".format(option_str, symbol_str, help_str)
-
-class menuwindow(window):
+class MenuWindow(Window):
     def __init__(self, win):
         super().__init__()
         self.__win = win
@@ -42,7 +21,7 @@ class menuwindow(window):
         pass
 
     def add_bool(self, symbol, default=None, help_str=""):
-        item = boolItem(symbol, default, help_str)
+        item = BoolItem(symbol, default, help_str)
         self.items.append(item)
 
     def cur_item(self):
@@ -78,7 +57,7 @@ class menuwindow(window):
             return self.EXIT
         elif user_input == ord('\n'):
             cur_item = self.cur_item()
-            if type(cur_item) == boolItem:
+            if type(cur_item) == BoolItem:
                 cur_item.toggle()
             else:
                 return self.ENTER
