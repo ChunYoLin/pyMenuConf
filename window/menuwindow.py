@@ -14,12 +14,6 @@ class MenuWindow(Window):
     def win(self):
         return self.__win
 
-    def add_subwin(self, item, win):
-        pass
-
-    def get_subwin(self):
-        pass
-
     def add_bool(self, symbol, default=None, help_str=""):
         item = BoolItem(symbol, default, help_str)
         self.items.append(item)
@@ -30,7 +24,9 @@ class MenuWindow(Window):
 
     def draw(self):
         self.win.clear()
+        max_y, max_x = self.win.getmaxyx()
         for idx, item in enumerate(self.items):
+            self.win.addstr(idx, int(max_x/3), item.help_str())
             if idx == self.cur_cursor:
                 self.win.addstr(idx, 0, item.str(), curses.A_REVERSE)
             else:
