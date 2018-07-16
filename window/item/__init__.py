@@ -1,1 +1,2 @@
-from .item import Item, BoolItem, MenuItem
+from .item import Item, BoolItem
+from .subwinitem import MenuItem
