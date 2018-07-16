@@ -11,6 +11,7 @@ def main(stdscr):
     main_window = MenuWindow(stdscr)
     main_window.add_menu(symbol="simulation_platform", options=["prosim", "rtl"], help_str="choose the simulation platform")
     main_window.add_bool(symbol="pattern", default=False, help_str="choose the pattern")
+    main_window.add_string(symbol="isa", default="mrv10e000", help_str="set the isa")
     cur_window = main_window
     pre_window = []
     while True:

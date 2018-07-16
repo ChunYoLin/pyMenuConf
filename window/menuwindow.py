@@ -1,6 +1,6 @@
 import curses
 from window.window import Window
-from window.item import BoolItem, MenuItem
+from window.item import BoolItem, MenuItem, StringItem
 
 
 class MenuWindow(Window):
@@ -20,6 +20,10 @@ class MenuWindow(Window):
 
     def add_menu(self, symbol, options=None, defaults=None, help_str=""):
         item = MenuItem(symbol, options, defaults, help_str)
+        self.items.append(item)
+
+    def add_string(self, symbol, default="", help_str=""):
+        item = StringItem(symbol, default, help_str)
         self.items.append(item)
 
     def cur_item(self):
