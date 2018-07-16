@@ -19,21 +19,25 @@ class Item(metaclass=abc.ABCMeta):
     def help_str(self):
         pass
 
+    @abc.abstractclassmethod
+    def value(self):
+        pass
+
 class BoolItem(Item):
     def __init__(self, symbol, default=False, help_str=""):
         assert default in [True, False]
         self.symbol = symbol
         self.default = default
         self._help_str = help_str
-        self.choice = self.default
+        self._value = self.default
     
     def toggle(self):
-        self.choice = not self.choice
+        self.value = not self.value
 
     def str(self):
         #  option string
         option_str = '[ ]'
-        if self.choice == True:
+        if self.value == True:
             option_str = '[X]'
         #  symbol string
         symbol_str = self.symbol
@@ -42,6 +46,14 @@ class BoolItem(Item):
     @property 
     def help_str(self):
         return self._help_str
+
+    @property
+    def value(self):
+        return self._value
+
+    @value.setter
+    def value(self, value):
+        self._value = value
 
 class SubwinItem(Item):
     def __init__(self):
@@ -80,10 +92,12 @@ class MenuItem(SubwinItem):
 
     def str(self):
         symbol_str = self.symbol
-        return "     {} ----->".format(symbol_str)
+        return "-->  {}".format(symbol_str)
 
     @property 
     def help_str(self):
         return self._help_str
-    
-        
+
+    @property  
+    def value(self):
+        return {item.symbol: item.value for item in self.subwin.items}

@@ -25,5 +25,7 @@ def main(stdscr):
             if sub_window:
                 pre_window.append(cur_window)
                 cur_window = sub_window
-
+    curses.endwin()
+    print(main_window.get_all_values())
 wrapper(main)
+

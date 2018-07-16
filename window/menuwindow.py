@@ -64,3 +64,9 @@ class MenuWindow(Window):
             elif user_input == curses.KEY_UP:
                 self.up()
             return self.STAY
+        
+    def get_all_values(self):
+        value_dict = {}
+        for item in self.items:
+            value_dict[item.symbol] = item.value
+        return value_dict
