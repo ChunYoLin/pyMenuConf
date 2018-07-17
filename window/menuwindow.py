@@ -33,12 +33,16 @@ class MenuWindow(Window):
     def draw(self):
         self.win.clear()
         max_y, max_x = self.win.getmaxyx()
+        max_prefix_len = max([len(item.prefix_str) for item in self.items])
+        max_symbol_len = max([len(item.symbol_str) for item in self.items])
+        symbol_pos = max_prefix_len + 5
+        help_pos = symbol_pos + max_symbol_len +5
         for idx, item in enumerate(self.items):
-            self.win.addstr(idx, int(max_x/3), item.help_str)
+            item_str = item.prefix_str + " "*(max_prefix_len-len(item.prefix_str)+5) + item.symbol_str + " "*(max_symbol_len-len(item.symbol_str)+5) + item.help_str
             if idx == self.cur_cursor:
-                self.win.addstr(idx, 0, item.str(), curses.A_REVERSE)
+                self.win.addstr(idx, 0, item_str, curses.A_REVERSE)
             else:
-                self.win.addstr(idx, 0, item.str())
+                self.win.addstr(idx, 0, item_str)
 
     def down(self):
         if self.cur_cursor < len(self.items)-1:

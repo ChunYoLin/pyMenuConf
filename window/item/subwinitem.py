@@ -41,9 +41,13 @@ class MenuItem(SubwinItem):
                 subwin.add_bool(option, default=False)
         self.subwin = subwin
 
-    def str(self):
-        symbol_str = self.symbol
-        return "-->  {}".format(symbol_str)
+    @property
+    def prefix_str(self):
+        return "----->"
+
+    @property
+    def symbol_str(self):
+        return self.symbol
 
     @property 
     def help_str(self):

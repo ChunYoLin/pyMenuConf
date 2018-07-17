@@ -13,7 +13,12 @@ class Item(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractclassmethod
-    def str(self):
+    def prefix_str(self):
+        pass
+
+    @property
+    @abc.abstractclassmethod
+    def symbol_str(self):
         pass
 
     @property
@@ -37,14 +42,13 @@ class BoolItem(Item):
     def toggle(self):
         self.value = not self.value
 
-    def str(self):
-        #  option string
-        option_str = '[ ]'
-        if self.value == True:
-            option_str = '[X]'
-        #  symbol string
-        symbol_str = self.symbol
-        return "{}  {}".format(option_str, symbol_str)
+    @property 
+    def prefix_str(self):
+        return "[X]" if self.value else "[ ]"
+
+    @property
+    def symbol_str(self):
+        return self.symbol
 
     @property 
     def help_str(self):
@@ -72,19 +76,35 @@ class StringItem(Item):
         title = "set the {}".format(self.symbol)
         win.keypad(True)
         win.addstr(1, 15-ceil(len(title)/2), title)
-        win.move(3, 15-ceil(len(title)/2))
+        text_start = 3, 15-ceil(len(title)/2)
+        win.move(text_start[0], text_start[1])
         win.box()
         curses.curs_set(1)
-        curses.echo()
-        value = win.getstr().decode("utf-8")
-        self.value = value
+        value = ""
+        while(True):
+            ch = win.getch()
+            if ch in (ord('q'), 27):
+                break
+            elif ch in (ord('\n'), ):
+                self.value = value
+                break
+            elif ch in (curses.KEY_BACKSPACE, 127, ):
+                value = value[:-1]
+                win.addstr(text_start[0], text_start[1], value+" ")
+                win.addstr(text_start[0], text_start[1], value)
+            else:
+                value += chr(ch)
+                win.addstr(text_start[0], text_start[1], value)
         curses.curs_set(0)
         curses.noecho()
         
-    def str(self):
-        value_str = self.value
-        symbol_str = self.symbol
-        return "{}  {}".format(value_str, symbol_str)
+    @property
+    def prefix_str(self):
+        return self.value
+
+    @property
+    def symbol_str(self):
+        return self.symbol
 
     @property 
     def help_str(self):
