@@ -1,6 +1,8 @@
+import os
+os.environ.setdefault('ESCDELAY', '25')
 import abc
-from math import ceil
 import curses
+from math import ceil
 from curses import textpad
 
 import window
@@ -83,7 +85,7 @@ class StringItem(Item):
         value = ""
         while(True):
             ch = win.getch()
-            if ch in (ord('q'), 27):
+            if ch in (27, ):
                 break
             elif ch in (ord('\n'), ):
                 self.value = value
