@@ -119,3 +119,23 @@ class StringItem(Item):
     @value.setter
     def value(self, value):
         self._value = value
+
+class EnumItem(StringItem):
+    def __init__(self, symbol, allow_values, default="", help_str=""):
+        super().__init__(symbol, default, help_str)
+        assert type(allow_values) == list
+        if default:
+            assert default in allow_values
+        self._allow_values = [""] + allow_values
+        self._cur_value_idx = self._allow_values.index(default)
+
+    def toggle(self):
+        if self._cur_value_idx < len(self._allow_values)-1:
+            self._cur_value_idx += 1
+        else:
+            self._cur_value_idx = 0
+        self.value = self.allow_values[self._cur_value_idx]
+
+    @property
+    def allow_values(self):
+        return self._allow_values
