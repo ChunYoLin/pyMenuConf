@@ -41,10 +41,11 @@ class MenuWindow(Window):
         max_symbol_len = max([len(item.symbol_str) for item in self.items])
         symbol_pos = max_prefix_len + 5
         help_pos = symbol_pos + max_symbol_len +5
+        curses.init_pair(1, curses.COLOR_YELLOW, curses.COLOR_BLACK)
         for idx, item in enumerate(self.items):
             item_str = item.prefix_str + " "*(max_prefix_len-len(item.prefix_str)+5) + item.symbol_str + " "*(max_symbol_len-len(item.symbol_str)+5) + item.help_str
             if idx == self.cur_cursor:
-                self.win.addstr(idx, 0, item_str, curses.A_REVERSE)
+                self.win.addstr(idx, 0, item_str, curses.A_REVERSE+curses.color_pair(1))
             else:
                 self.win.addstr(idx, 0, item_str)
 
