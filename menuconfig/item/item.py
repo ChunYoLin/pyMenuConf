@@ -5,9 +5,6 @@ import curses
 from math import ceil
 from curses import textpad
 
-import window
-from window import Window
-
 
 class Item(metaclass=abc.ABCMeta):
     @abc.abstractclassmethod

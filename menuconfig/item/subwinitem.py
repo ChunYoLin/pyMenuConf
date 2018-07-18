@@ -1,10 +1,10 @@
 import abc
 import curses
 
-import window
-from window import Window
-from window.item import Item
-from window.item import BoolItem
+import menuconfig
+from menuconfig import Window
+from menuconfig.item import Item
+from menuconfig.item import BoolItem
 
 
 class SubwinItem(Item):
@@ -34,7 +34,7 @@ class MenuItem(SubwinItem):
     def init_subwin(self):
         win = curses.newwin(curses.LINES, curses.COLS)
         win.keypad(True)
-        subwin = window.MenuWindow(win)
+        subwin = menuconfig.MenuWindow(win)
         for option in self.options:
             if self.defaults and option in self.defaults:
                 subwin.add_item(BoolItem(option, default=True))

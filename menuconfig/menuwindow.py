@@ -1,6 +1,6 @@
 import curses
-from window.window import Window
-from window.item import BoolItem, MenuItem, StringItem, EnumItem
+from menuconfig.window import Window
+from menuconfig.item import BoolItem, MenuItem, StringItem, EnumItem
 
 
 class MenuWindow(Window):

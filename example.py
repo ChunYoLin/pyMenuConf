@@ -1,8 +1,8 @@
 import sys, os
 import curses
 from curses import wrapper
-from window import Window, WindowManager, MenuWindow
-from window.item import MenuItem, BoolItem, StringItem, EnumItem
+from menuconfig import Window, WindowManager, MenuWindow
+from menuconfig.item import MenuItem, BoolItem, StringItem, EnumItem
 
 
 def main(stdscr):
