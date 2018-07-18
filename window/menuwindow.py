@@ -62,7 +62,17 @@ class MenuWindow(Window):
         help_pos = symbol_pos + max_symbol_len +5
         curses.init_pair(1, curses.COLOR_YELLOW, curses.COLOR_BLACK)
         for idx, item in enumerate(self.items):
-            item_str = item.prefix_str + " "*(max_prefix_len-len(item.prefix_str)+5) + item.symbol_str + " "*(max_symbol_len-len(item.symbol_str)+5) + item.help_str
+            #  format the option string
+            item_str = ""
+            if item.prefix_str:
+                item_str += item.prefix_str 
+            if item.symbol_str:
+                item_str += " "*(max_prefix_len-len(item.prefix_str)+5) 
+                item_str += item.symbol_str 
+            if item.help_str:
+                item_str += " "*(max_symbol_len-len(item.symbol_str)+5) 
+                item_str += item.help_str
+            #  highlight the chosen option
             if idx == self.cur_cursor:
                 self.win.addstr(idx, 0, item_str, curses.A_REVERSE+curses.color_pair(1))
             else:
