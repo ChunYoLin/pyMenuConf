@@ -7,34 +7,53 @@ class MenuWindow(Window):
     def __init__(self, win):
         super().__init__()
         self.__win = win
-        self.items = []
+        self.__items = []
         self.cur_cursor = 0
 
     @property
     def win(self):
         return self.__win
 
-    def add_bool(self, symbol, default=False, help_str=""):
-        item = BoolItem(symbol, default, help_str)
-        self.items.append(item)
-
-    def add_menu(self, symbol, options=None, defaults=None, help_str=""):
-        item = MenuItem(symbol, options, defaults, help_str)
-        self.items.append(item)
-
-    def add_string(self, symbol, default="", help_str=""):
-        item = StringItem(symbol, default, help_str)
-        self.items.append(item)
-
-    def add_enum(self, symbol, allow_values, default="", help_str=""):
-        item = EnumItem(symbol, allow_values, default, help_str)
-        self.items.append(item)
+    @property
+    def items(self):
+        return [item for item in self.__items if item.valid]
 
     def cur_item(self):
         if self.items:
             return self.items[self.cur_cursor]
 
+    def add_item(self, item, depend_bool=None, depend_string=None):
+        item.valid = True
+        item.depends = {}
+        if depend_bool:
+            for depend_key in depend_bool:
+                item.depends[depend_key] = True
+        if depend_string:
+            for depend_key, depend_val in depend_string:
+                item.depends[depend_key] = depend_val
+        self.__items.append(item)
+
+    def update_item(self):
+        for item in self.__items:
+            if item.depends:
+                self.check_item_depends(item)
+
+    def check_item_depends(self, check_item):
+        check = []
+        for depend_key, depend_val in check_item.depends.items():
+            for item in self.__items:
+                if item.symbol == depend_key:
+                    if type(item.value) == list and depend_val in item.value:
+                        check.append(True)
+                    elif depend_val == item.value:
+                        check.append(True)
+                    else:
+                        check.append(False)
+        if check:
+            check_item.valid = all(check)
+        
     def draw(self):
+        self.update_item()
         self.win.clear()
         max_y, max_x = self.win.getmaxyx()
         max_prefix_len = max([len(item.prefix_str) for item in self.items])

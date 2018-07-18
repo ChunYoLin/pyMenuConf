@@ -4,6 +4,7 @@ import curses
 import window
 from window import Window
 from window.item import Item
+from window.item import BoolItem
 
 
 class SubwinItem(Item):
@@ -36,9 +37,9 @@ class MenuItem(SubwinItem):
         subwin = window.MenuWindow(win)
         for option in self.options:
             if self.defaults and option in self.defaults:
-                subwin.add_bool(option, default=True)
+                subwin.add_item(BoolItem(option, default=True))
             else:
-                subwin.add_bool(option, default=False)
+                subwin.add_item(BoolItem(option, default=False))
         self.subwin = subwin
 
     @property
@@ -55,4 +56,4 @@ class MenuItem(SubwinItem):
 
     @property  
     def value(self):
-        return {item.symbol: item.value for item in self.subwin.items}
+        return [item.symbol for item in self.subwin.items if item.value]
