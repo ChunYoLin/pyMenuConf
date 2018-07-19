@@ -9,6 +9,7 @@ class MenuWindow(Window):
         super().__init__()
         self.__win = win
         self.__items = []
+        self.__item_symbols = []
         self.cur_cursor = 0
 
     @property
@@ -23,6 +24,12 @@ class MenuWindow(Window):
         if self.items:
             return self.items[self.cur_cursor]
 
+    def get_item(self, symbol):
+        if self.items:
+            item_index = self.__item_symbols.index(symbol)
+            item = self.__items[item_index]
+            return item
+
     def add_item(self, item, depend_bool=None, depend_string=None):
         item.valid = True
         item.depends = {}
@@ -33,6 +40,7 @@ class MenuWindow(Window):
             for depend_key, depend_val in depend_string:
                 item.depends[depend_key] = depend_val
         self.__items.append(item)
+        self.__item_symbols.append(item.symbol)
 
     def update_item(self):
         for item in self.__items:
@@ -42,14 +50,14 @@ class MenuWindow(Window):
     def check_item_depends(self, check_item):
         check = []
         for depend_key, depend_val in check_item.depends.items():
-            for item in self.__items:
-                if item.symbol == depend_key:
-                    if type(item.value) == list and depend_val in item.value:
-                        check.append(True)
-                    elif depend_val == item.value:
-                        check.append(True)
-                    else:
-                        check.append(False)
+            item = self.get_item(depend_key)
+            if item:
+                if type(item.value) == list and depend_val in item.value:
+                    check.append(True)
+                elif depend_val == item.value:
+                    check.append(True)
+                else:
+                    check.append(False)
         if check:
             check_item.valid = all(check)
         
@@ -123,13 +131,13 @@ class MenuWindow(Window):
                     value = value.replace("\"", "")
                     value = value.replace("\'", "")
                     value = value.split()
-                    for item in self.items:
-                        if item.symbol == symbol:
-                            for v in value:
-                                if v == "True":
-                                    v = True
-                                if v == "False":
-                                    v = False
-                                if v == "None":
-                                    v = None
-                                item.value = v
+                    item = self.get_item(symbol)
+                    if item and item.symbol == symbol:
+                        for v in value:
+                            if v == "True":
+                                v = True
+                            if v == "False":
+                                v = False
+                            if v == "None":
+                                v = None
+                            item.value = v
