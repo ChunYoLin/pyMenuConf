@@ -10,6 +10,7 @@ class MenuWindow(Window):
         self.__win = win
         self.__items = []
         self.__item_symbols = []
+        self.__callbacks = {}
         self.cur_cursor = 0
 
     @property
@@ -44,10 +45,14 @@ class MenuWindow(Window):
         self.__items.append(item)
         self.__item_symbols.append(item.symbol)
 
+    def add_callback(self, symbol, value, f, *fargs, **fkwargs):
+        self.__callbacks[symbol] = (value, f, fargs, fkwargs)
+
     def update_item(self):
         for item in self.__items:
             if item.depends:
                 self.check_item_depends(item)
+            self.check_callback(item)
 
     def check_item_depends(self, check_item):
         check = []
@@ -70,7 +75,17 @@ class MenuWindow(Window):
                         check.append(False)
         if check:
             check_item.valid = all(check)
-        
+
+    def check_callback(self, item):
+        if item.symbol in self.__callbacks.keys():
+            value, f, fargs, fkwargs = self.__callbacks[item.symbol]
+            if type(item.value) == list:
+                if value in item.value:
+                    f(*fargs, **fkwargs)
+            else:
+                if item.value == value:
+                    f(*fargs, **fkwargs)
+
     def draw(self):
         self.update_item()
         self.win.clear()
