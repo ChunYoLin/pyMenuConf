@@ -136,3 +136,11 @@ class EnumItem(StringItem):
     @property
     def allow_values(self):
         return self._allow_values
+
+    @property
+    def value(self):
+        return self._value
+
+    @value.setter
+    def value(self, value):
+        self._value = value

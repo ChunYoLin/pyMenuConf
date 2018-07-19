@@ -57,3 +57,9 @@ class MenuItem(SubwinItem):
     @property  
     def value(self):
         return [item.symbol for item in self.subwin.items if item.value]
+    
+    @value.setter
+    def value(self, value):
+        for item in self.subwin.items:
+            if item.symbol == value:
+                item.value = True
