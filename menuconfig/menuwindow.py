@@ -34,11 +34,11 @@ class MenuWindow(Window):
         item.valid = True
         item.depends = {}
         if depend_bool:
-            for depend_key in depend_bool:
-                item.depends[depend_key] = True
+            for depend_symbol in depend_bool:
+                item.depends[depend_symbol] = True
         if depend_string:
-            for depend_key, depend_val in depend_string:
-                item.depends[depend_key] = depend_val
+            for depend_symbol, depend_val in depend_string:
+                item.depends[depend_symbol] = depend_val
         self.__items.append(item)
         self.__item_symbols.append(item.symbol)
 
@@ -49,8 +49,8 @@ class MenuWindow(Window):
 
     def check_item_depends(self, check_item):
         check = []
-        for depend_key, depend_val in check_item.depends.items():
-            item = self.get_item(depend_key)
+        for depend_symbol, depend_val in check_item.depends.items():
+            item = self.get_item(depend_symbol)
             if item:
                 if type(item.value) == list and depend_val in item.value:
                     check.append(True)
