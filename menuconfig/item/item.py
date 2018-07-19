@@ -10,36 +10,49 @@ from menuconfig import Window
 
 
 class Item(metaclass=abc.ABCMeta):
+    def __init__(self, symbol, default, help_str):
+        self.__symbol = symbol
+        self.__default = default
+        self.__value = default
+        self.__help_str = help_str
+
     @abc.abstractclassmethod
     def toggle(self):
         pass
 
+    @property
     @abc.abstractclassmethod
     def prefix_str(self):
         pass
 
     @property
-    @abc.abstractclassmethod
     def symbol_str(self):
-        pass
+        return self.__symbol
 
     @property
-    @abc.abstractclassmethod
     def help_str(self):
-        pass
+        return self.__help_str
 
     @property
-    @abc.abstractclassmethod
+    def default(self):
+        return self.__default
+
+    @property
+    def symbol(self):
+        return self.__symbol
+
+    @property
     def value(self):
-        pass
+        return self.__value
+
+    @value.setter
+    def value(self, value):
+        self.__value = value
 
 class BoolItem(Item):
     def __init__(self, symbol, default=False, help_str=""):
         assert default in [True, False]
-        self.symbol = symbol
-        self.default = default
-        self._help_str = help_str
-        self._value = self.default
+        super().__init__(symbol, default, help_str)
     
     def toggle(self):
         self.value = not self.value
@@ -48,28 +61,9 @@ class BoolItem(Item):
     def prefix_str(self):
         return "[X]" if self.value else "[ ]"
 
-    @property
-    def symbol_str(self):
-        return self.symbol
-
-    @property 
-    def help_str(self):
-        return self._help_str
-
-    @property
-    def value(self):
-        return self._value
-
-    @value.setter
-    def value(self, value):
-        self._value = value
-
 class StringItem(Item):
     def __init__(self, symbol, default="", help_str=""):
-        self.symbol = symbol
-        self.default = default
-        self._value = self.default
-        self._help_str = help_str
+        super().__init__(symbol, default, help_str)
 
     def toggle(self):
         mid_y = int(curses.LINES/2)
@@ -104,33 +98,17 @@ class StringItem(Item):
     def prefix_str(self):
         return self.value
 
-    @property
-    def symbol_str(self):
-        return self.symbol
-
-    @property 
-    def help_str(self):
-        return self._help_str
-
-    @property
-    def value(self):
-        return self._value
-
-    @value.setter
-    def value(self, value):
-        self._value = value
-
 class EnumItem(StringItem):
     def __init__(self, symbol, allow_values, default="", help_str=""):
-        super().__init__(symbol, default, help_str)
         assert type(allow_values) == list
+        super().__init__(symbol, default, help_str)
         if default:
             assert default in allow_values
-        self._allow_values = [""] + allow_values
-        self._cur_value_idx = self._allow_values.index(default)
+        self.__allow_values = [""] + allow_values
+        self._cur_value_idx = self.__allow_values.index(default)
 
     def toggle(self):
-        if self._cur_value_idx < len(self._allow_values)-1:
+        if self._cur_value_idx < len(self.__allow_values)-1:
             self._cur_value_idx += 1
         else:
             self._cur_value_idx = 0
@@ -138,20 +116,9 @@ class EnumItem(StringItem):
 
     @property
     def allow_values(self):
-        return self._allow_values
-
-    @property
-    def value(self):
-        return self._value
-
-    @value.setter
-    def value(self, value):
-        self._value = value
+        return self.__allow_values
 
 class SubwinItem(Item):
-    def __init__(self):
-        pass
-
     @abc.abstractclassmethod
     def get_subwin(self):
         pass
@@ -160,13 +127,11 @@ class SubwinItem(Item):
         return Window.ENTER
 
 class MenuItem(SubwinItem):
-    def __init__(self, symbol, options=None, defaults=None, help_str=""):
-        self.symbol = symbol
-        if defaults:
-            assert set(defaults).issubset(set(options))
-        self.options = options
-        self.defaults = defaults
-        self._help_str = help_str
+    def __init__(self, symbol, options=None, default=None, help_str=""):
+        super().__init__(symbol, default, help_str)
+        if default:
+            assert set(default).issubset(set(options))
+        self.__options = options
         self.init_subwin()
 
     def get_subwin(self):
@@ -177,23 +142,19 @@ class MenuItem(SubwinItem):
         win.keypad(True)
         subwin = menuconfig.MenuWindow(win)
         for option in self.options:
-            if self.defaults and option in self.defaults:
+            if self.default and option in self.default:
                 subwin.add_item(BoolItem(option, default=True))
             else:
                 subwin.add_item(BoolItem(option, default=False))
         self.subwin = subwin
 
     @property
-    def prefix_str(self):
-        return "----->"
+    def options(self):
+        return self.__options
 
     @property
-    def symbol_str(self):
-        return self.symbol
-
-    @property 
-    def help_str(self):
-        return self._help_str
+    def prefix_str(self):
+        return "----->"
 
     @property  
     def value(self):
