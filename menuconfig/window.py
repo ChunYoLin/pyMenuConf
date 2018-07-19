@@ -6,6 +6,7 @@ class Window(metaclass=abc.ABCMeta):
     EXIT = 0
     ENTER = 1
     STAY = 2
+    CONFIG = 3
 
     def __init__(self):
         pass

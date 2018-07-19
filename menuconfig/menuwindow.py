@@ -135,6 +135,7 @@ class MenuWindow(Window):
         elif user_input == ord('c'):
             for item in self.items:
                 item.config = True
+            return self.CONFIG
         else:
             if user_input == curses.KEY_DOWN:
                 self.down()
@@ -147,6 +148,9 @@ class MenuWindow(Window):
         for item in self.items:
             value_dict[item.symbol] = item.value
         return value_dict
+    
+    def get_all_config(self):
+        return all([item.config for item in self.items])
 
     def load_scons_config_file(self, config_file):
         with open(config_file) as conf_file:
