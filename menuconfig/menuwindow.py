@@ -1,3 +1,4 @@
+import re
 import curses
 from menuconfig.window import Window
 from menuconfig.item import BoolItem, MenuItem, StringItem, EnumItem
@@ -112,3 +113,23 @@ class MenuWindow(Window):
         for item in self.items:
             value_dict[item.symbol] = item.value
         return value_dict
+    
+    def load_scons_config_file(self, config_file):
+        with open(config_file) as conf_file:
+            for line in conf_file.read().splitlines():
+                group = re.match("(.*)=(.*)", line) 
+                if (group):
+                    symbol, value = group[1], group[2]
+                    value = value.replace("\"", "")
+                    value = value.replace("\'", "")
+                    value = value.split()
+                    for item in self.items:
+                        if item.symbol == symbol:
+                            for v in value:
+                                if v == "True":
+                                    v = True
+                                if v == "False":
+                                    v = False
+                                if v == "None":
+                                    v = None
+                                item.value = v
