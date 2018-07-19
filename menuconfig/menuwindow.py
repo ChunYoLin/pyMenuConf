@@ -1,7 +1,6 @@
 import re
 import curses
 from menuconfig.window import Window
-from menuconfig.item import BoolItem, MenuItem, StringItem, EnumItem
 
 
 class MenuWindow(Window):
@@ -35,11 +34,11 @@ class MenuWindow(Window):
         item.valid = True
         item.depends = {}
         if depend_bool:
-            assert type(depend_bool) == list
+            assert isinstance(depend_bool, list)
             for depend_symbol in depend_bool:
                 item.depends[depend_symbol] = True
         if depend_string:
-            assert type(depend_string) == list
+            assert isinstance(depend_string, list)
             for depend_symbol, depend_val in depend_string:
                 item.depends[depend_symbol] = depend_val
         self.__items.append(item)
@@ -59,15 +58,15 @@ class MenuWindow(Window):
         for depend_symbol, depend_val in check_item.depends.items():
             item = self.get_item(depend_symbol)
             if item:
-                if type(depend_val) == list:
-                    if type(item.value) == list and set(depend_val).issubset(item.value):
+                if isinstance(depend_val, list):
+                    if isinstance(item.value, list) and set(depend_val).issubset(item.value):
                         check.append(True)
                     elif len(depend_val) == 1 and depend_val[0] == item.value:
                         check.append(True)
                     else:
                         check.append(False)
                 else:
-                    if type(item.value) == list and depend_val in item.value:
+                    if isinstance(item.value, list) and depend_val in item.value:
                         check.append(True)
                     elif depend_val == item.value:
                         check.append(True)
@@ -79,7 +78,7 @@ class MenuWindow(Window):
     def check_callback(self, item):
         if item.symbol in self.__callbacks.keys():
             value, f, fargs, fkwargs = self.__callbacks[item.symbol]
-            if type(item.value) == list:
+            if isinstance(item.value, list):
                 if value in item.value:
                     f(*fargs, **fkwargs)
             else:
@@ -89,22 +88,19 @@ class MenuWindow(Window):
     def draw(self):
         self.update_item()
         self.win.clear()
-        max_y, max_x = self.win.getmaxyx()
         max_prefix_len = max([len(item.prefix_str) for item in self.items])
         max_symbol_len = max([len(item.symbol_str) for item in self.items])
-        symbol_pos = max_prefix_len + 5
-        help_pos = symbol_pos + max_symbol_len +5
         curses.init_pair(1, curses.COLOR_YELLOW, curses.COLOR_BLACK)
         for idx, item in enumerate(self.items):
             #  format the option string
             item_str = ""
             if item.prefix_str:
-                item_str += item.prefix_str 
+                item_str += item.prefix_str
             if item.symbol_str:
-                item_str += " "*(max_prefix_len-len(item.prefix_str)+5) 
-                item_str += item.symbol_str 
+                item_str += " "*(max_prefix_len-len(item.prefix_str)+5)
+                item_str += item.symbol_str
             if item.help_str:
-                item_str += " "*(max_symbol_len-len(item.symbol_str)+5) 
+                item_str += " "*(max_symbol_len-len(item.symbol_str)+5)
                 item_str += item.help_str
             #  highlight the chosen option
             if idx == self.cur_cursor:
@@ -140,18 +136,18 @@ class MenuWindow(Window):
             elif user_input == curses.KEY_UP:
                 self.up()
             return self.STAY
-        
+
     def get_all_values(self):
         value_dict = {}
         for item in self.items:
             value_dict[item.symbol] = item.value
         return value_dict
-    
+
     def load_scons_config_file(self, config_file):
         with open(config_file) as conf_file:
             for line in conf_file.read().splitlines():
-                group = re.match("(.*)=(.*)", line) 
-                if (group):
+                group = re.match("(.*)=(.*)", line)
+                if group:
                     symbol, value = group[1], group[2]
                     value = value.replace("\"", "")
                     value = value.replace("\'", "")

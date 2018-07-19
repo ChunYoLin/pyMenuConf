@@ -1,12 +1,10 @@
-import sys, os
 import curses
 from curses import wrapper
-from menuconfig import Window, WindowManager, MenuWindow
+from menuconfig import WindowManager, MenuWindow
 from menuconfig.item import MenuItem, BoolItem, StringItem, EnumItem
 
 
 def main(stdscr):
-    user_input = 0
     curses.curs_set(False)
     main_window = MenuWindow(stdscr)
     main_window.add_item(BoolItem(symbol="buy", default=False, help_str="buy or not"))
@@ -18,4 +16,3 @@ def main(stdscr):
     print(wm.get_all_values())
 
 wrapper(main)
-
