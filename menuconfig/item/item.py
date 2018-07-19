@@ -15,6 +15,7 @@ class Item(metaclass=abc.ABCMeta):
         self.__default = default
         self.__value = default
         self.__help_str = help_str
+        self.__config = False
 
     @abc.abstractclassmethod
     def toggle(self):
@@ -48,6 +49,15 @@ class Item(metaclass=abc.ABCMeta):
     @value.setter
     def value(self, value):
         self.__value = value
+        self.config = False
+
+    @property
+    def config(self):
+        return self.__config
+
+    @config.setter
+    def config(self, value):
+        self.__config = value
 
 class BoolItem(Item):
     def __init__(self, symbol, default=False, help_str=""):
@@ -165,3 +175,13 @@ class MenuItem(SubwinItem):
         for item in self.subwin.items:
             if item.symbol == value:
                 item.value = True
+
+    #  overwrite the value setter, must set the config property as well
+    @property
+    def config(self):
+        return all([item.config for item in self.subwin.items])
+
+    @config.setter
+    def config(self, value):
+        for item in self.subwin.items:
+            item.config = value

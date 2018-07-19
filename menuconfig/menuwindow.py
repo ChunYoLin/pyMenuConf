@@ -94,6 +94,8 @@ class MenuWindow(Window):
         for idx, item in enumerate(self.items):
             #  format the option string
             item_str = ""
+            if item.config == False:
+                item_str += "*"
             if item.prefix_str:
                 item_str += item.prefix_str
             if item.symbol_str:
@@ -130,6 +132,9 @@ class MenuWindow(Window):
         elif user_input == ord('\n'):
             cur_item = self.cur_item()
             return cur_item.toggle()
+        elif user_input == ord('c'):
+            for item in self.items:
+                item.config = True
         else:
             if user_input == curses.KEY_DOWN:
                 self.down()
