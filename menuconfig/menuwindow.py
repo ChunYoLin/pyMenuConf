@@ -11,6 +11,7 @@ class MenuWindow(Window):
         self.__item_symbols = []
         self.__callbacks = {}
         self.cur_cursor = 0
+        self.unload = []
 
     @property
     def win(self):
@@ -25,10 +26,12 @@ class MenuWindow(Window):
             return self.items[self.cur_cursor]
 
     def get_item(self, symbol):
-        if self.items:
+        if self.items and symbol in self.__item_symbols:
             item_index = self.__item_symbols.index(symbol)
             item = self.__items[item_index]
             return item
+        else:
+            return None
 
     def add_item(self, item, depend_bool=None, depend_string=None):
         item.valid = True
@@ -52,6 +55,10 @@ class MenuWindow(Window):
             if item.depends:
                 self.check_item_depends(item)
             self.check_callback(item)
+        _unload = self.unload[:] 
+        for line in _unload:
+            if self.load_scons_line(line):
+                self.unload.remove(line)
 
     def check_item_depends(self, check_item):
         check = []
@@ -155,19 +162,27 @@ class MenuWindow(Window):
     def load_scons_config_file(self, config_file):
         with open(config_file) as conf_file:
             for line in conf_file.read().splitlines():
-                group = re.match("(.*)=(.*)", line)
-                if group:
-                    symbol, value = group[1], group[2]
-                    value = value.replace("\"", "")
-                    value = value.replace("\'", "")
-                    value = value.split()
-                    item = self.get_item(symbol)
-                    if item and item.symbol == symbol:
-                        for v in value:
-                            if v == "True":
-                                v = True
-                            if v == "False":
-                                v = False
-                            if v == "None":
-                                v = None
-                            item.value = v
+                if not self.load_scons_line(line):
+                    self.unload.append(line)
+
+    def load_scons_line(self, line):
+        group = re.match("(.*)=(.*)", line)
+        if group:
+            symbol, value = group[1], group[2]
+            value = value.replace("\"", "")
+            value = value.replace("\'", "")
+            value = value.split(",")
+            item = self.get_item(symbol)
+            if item:
+                for v in value:
+                    if v == "True":
+                        v = True
+                    if v == "False":
+                        v = False
+                    if v == "None":
+                        v = None
+                    item.value = v
+                return True
+            else:
+                return False
+
