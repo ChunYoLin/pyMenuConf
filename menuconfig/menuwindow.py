@@ -103,15 +103,17 @@ class MenuWindow(Window):
                     f(*fargs, **fkwargs)
 
     def draw(self):
+        curses.init_pair(1, curses.COLOR_YELLOW, curses.COLOR_BLACK)
+        self.win.bkgdset(" ", curses.A_BOLD)
         self.update_item()
         self.win.clear()
+        #  show the title string
         max_y, max_x = self.win.getmaxyx()
-        self.win.addstr(0, ceil(max_x/2), f"{self.name}")
-        self.win.addstr(1, 0, "="*max_x)
+        self.win.addstr(1, 0, " "*max_x, curses.A_REVERSE+curses.color_pair(1))
+        self.win.addstr(1, ceil(max_x/2-len(self.name)/2), f"{self.name}", curses.A_REVERSE+curses.color_pair(1))
         max_type_len = max([len(item.type_str) for item in self.items])
         max_prefix_len = max([len(item.prefix_str) for item in self.items])
         max_symbol_len = max([len(item.symbol_str) for item in self.items])
-        curses.init_pair(1, curses.COLOR_YELLOW, curses.COLOR_BLACK)
         for idx, item in enumerate(self.items):
             #  format the option string
             item_str = ""
@@ -119,6 +121,8 @@ class MenuWindow(Window):
             item_str += " "*(max_type_len-len(item.type_str)+5)
             if item.config == False:
                 item_str += "*"
+            else:
+                item_str += " "
             if item.prefix_str:
                 item_str += item.prefix_str
             if item.symbol_str:
@@ -129,9 +133,23 @@ class MenuWindow(Window):
                 item_str += item.help_str
             #  highlight the chosen option
             if idx == self.cur_cursor:
-                self.win.addstr(idx+2, 0, item_str, curses.A_REVERSE+curses.color_pair(1))
+                self.win.addstr(idx+2, 0, item_str, curses.A_REVERSE)
             else:
                 self.win.addstr(idx+2, 0, item_str)
+        #  draw the usage
+        usage_y = max_y - 5
+        self.win.addstr(usage_y, 0, " "*max_x, curses.A_REVERSE+curses.color_pair(1))
+        self.win.addstr(usage_y, ceil(max_x/2)-3, "Usage", curses.A_REVERSE+curses.color_pair(1))
+        
+        offset_y = 1
+        pre_len = 0
+        for idx, usage in enumerate(self.usage):
+            self.win.addstr(usage_y+offset_y, pre_len, usage)
+            pre_len += len(usage)+3
+            if idx % 3 == 0 and idx != 0:
+                offset_y += 1
+                pre_len = 0
+                
 
     def down(self):
         if self.cur_cursor < len(self.items)-1:
@@ -144,6 +162,17 @@ class MenuWindow(Window):
             self.cur_cursor -= 1
         else:
             self.cur_cursor = 0
+
+    @property
+    def usage(self):
+        usage_list = []
+        exit_usage = "[q] Exit"
+        enter_usage = "[ENTER] Toggle/Enter"
+        config_usage = "[c] for config"
+        usage_list.append(exit_usage)
+        usage_list.append(enter_usage)
+        usage_list.append(config_usage)
+        return usage_list
 
     def main_loop(self):
         #  draw the menu
