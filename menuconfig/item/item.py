@@ -59,6 +59,11 @@ class Item(metaclass=abc.ABCMeta):
     def config(self, value):
         self.__config = value
 
+    @property
+    @abc.abstractclassmethod
+    def type_str(self):
+        pass
+
 class BoolItem(Item):
     def __init__(self, symbol, default=False, help_str=""):
         assert default in [True, False]
@@ -70,6 +75,10 @@ class BoolItem(Item):
     @property 
     def prefix_str(self):
         return "[X]" if self.value else "[ ]"
+
+    @property 
+    def type_str(self):
+        return "BOOL"
 
 class StringItem(Item):
     def __init__(self, symbol, default="", help_str=""):
@@ -108,6 +117,10 @@ class StringItem(Item):
     def prefix_str(self):
         return self.value
 
+    @property 
+    def type_str(self):
+        return "STRING"
+
 class EnumItem(StringItem):
     def __init__(self, symbol, allow_values, default="", help_str=""):
         assert type(allow_values) == list
@@ -127,6 +140,10 @@ class EnumItem(StringItem):
     @property
     def allow_values(self):
         return self.__allow_values
+
+    @property 
+    def type_str(self):
+        return "ENUM"
 
 class SubwinItem(Item):
     @abc.abstractclassmethod
@@ -185,3 +202,7 @@ class MenuItem(SubwinItem):
     def config(self, value):
         for item in self.subwin.items:
             item.config = value
+
+    @property 
+    def type_str(self):
+        return "MENU"

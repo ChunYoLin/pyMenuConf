@@ -95,12 +95,15 @@ class MenuWindow(Window):
     def draw(self):
         self.update_item()
         self.win.clear()
+        max_type_len = max([len(item.type_str) for item in self.items])
         max_prefix_len = max([len(item.prefix_str) for item in self.items])
         max_symbol_len = max([len(item.symbol_str) for item in self.items])
         curses.init_pair(1, curses.COLOR_YELLOW, curses.COLOR_BLACK)
         for idx, item in enumerate(self.items):
             #  format the option string
             item_str = ""
+            item_str += f"({item.type_str})"
+            item_str += " "*(max_type_len-len(item.type_str)+5)
             if item.config == False:
                 item_str += "*"
             if item.prefix_str:
