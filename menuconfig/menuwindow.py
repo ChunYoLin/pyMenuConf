@@ -1,4 +1,5 @@
 import re
+import abc
 import curses
 from math import ceil
 from menuconfig.window import Window
@@ -14,6 +15,12 @@ class MenuWindow(Window):
         self.__cur_cursor = -2
         self.name = name
         self.unload = []
+        self.init_action()
+
+    def init_action(self):
+        self.actions = []
+        for action in InputAction.__subclasses__():
+            self.actions.append(action())
 
     @property
     def cur_cursor(self):
@@ -144,34 +151,17 @@ class MenuWindow(Window):
         offset_y = 1
         pre_len = 0
         for idx, usage in enumerate(self.usage):
-            self.win.addstr(usage_y+offset_y, pre_len, usage)
-            pre_len += len(usage)+3
             if idx % 3 == 0 and idx != 0:
                 offset_y += 1
                 pre_len = 0
-                
-
-    def down(self):
-        if self.cur_cursor < len(self.items)-1:
-            self.cur_cursor += 1
-        else:
-            self.cur_cursor = len(self.items)-1
-
-    def up(self):
-        if self.cur_cursor > 0:
-            self.cur_cursor -= 1
-        else:
-            self.cur_cursor = 0
+            self.win.addstr(usage_y+offset_y, pre_len, usage)
+            pre_len += len(usage)+3
 
     @property
     def usage(self):
         usage_list = []
-        exit_usage = "[q] Exit"
-        enter_usage = "[ENTER] Toggle/Enter"
-        config_usage = "[c] for config"
-        usage_list.append(exit_usage)
-        usage_list.append(enter_usage)
-        usage_list.append(config_usage)
+        for action in self.actions:
+            usage_list.append(action.usage)
         return usage_list
 
     def main_loop(self):
@@ -179,21 +169,10 @@ class MenuWindow(Window):
         self.draw()
         #  process user input
         user_input = self.win.getch()
-        if user_input == ord('q'):
-            return self.EXIT
-        elif user_input == ord('\n'):
-            cur_item = self.cur_item()
-            return cur_item.toggle()
-        elif user_input == ord('c'):
-            for item in self.items:
-                item.config = True
-            return self.CONFIG
-        else:
-            if user_input == curses.KEY_DOWN:
-                self.down()
-            elif user_input == curses.KEY_UP:
-                self.up()
-            return self.STAY
+        for action in self.actions:
+            if user_input in action.key:
+                cur_item = self.cur_item()
+                return action.action(self, cur_item)
 
     def get_all_values(self):
         value_dict = {}
@@ -231,3 +210,87 @@ class MenuWindow(Window):
             else:
                 return False
 
+class InputAction(metaclass=abc.ABCMeta):
+    def __init__(self):
+        pass
+
+    @property
+    @abc.abstractclassmethod
+    def usage(self):
+        pass
+
+    @property
+    @abc.abstractclassmethod
+    def key(self):
+        pass
+
+    @abc.abstractclassmethod
+    def action(self, window, item):
+        pass
+
+class QuitAction(InputAction):
+    @property
+    def usage(self):
+        return "[q] exit or return to previous page"
+
+    @property
+    def key(self):
+        return (ord('q'), )
+
+    def action(self, window, item):
+        return Window.EXIT
+
+class EnterAction(InputAction):
+    @property
+    def usage(self):
+        return "[ENTER] Toggle/Enter"
+
+    @property
+    def key(self):
+        return (ord('\n'), )
+
+    def action(self, window, item):
+        return item.toggle()
+
+class ConfigAction(InputAction):
+    @property
+    def usage(self):
+        return "[c] Config the current setting"
+
+    @property
+    def key(self):
+        return (ord('c'), )
+
+    def action(self, window, item):
+        for item in window.items:
+            item.config = True
+
+class UpAction(InputAction):
+    @property
+    def usage(self):
+        return "[UP] Go Up"
+
+    @property
+    def key(self):
+        return (curses.KEY_UP, )
+
+    def action(self, window, item):
+        if window.cur_cursor > 0:
+            window.cur_cursor -= 1
+        else:
+            window.cur_cursor = 0
+
+class DownAction(InputAction):
+    @property
+    def usage(self):
+        return "[DOWN] Go Down"
+
+    @property
+    def key(self):
+        return (curses.KEY_DOWN, )
+
+    def action(self, window, item):
+        if window.cur_cursor < len(window.items)-1:
+            window.cur_cursor += 1
+        else:
+            window.cur_cursor = len(window.items)-1
