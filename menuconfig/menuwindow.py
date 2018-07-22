@@ -1,17 +1,27 @@
 import re
 import curses
+from math import ceil
 from menuconfig.window import Window
 
 
 class MenuWindow(Window):
-    def __init__(self, win):
+    def __init__(self, win, name=""):
         super().__init__()
         self.__win = win
         self.__items = []
         self.__item_symbols = []
         self.__callbacks = {}
-        self.cur_cursor = 0
+        self.__cur_cursor = -2
+        self.name = name
         self.unload = []
+
+    @property
+    def cur_cursor(self):
+        return self.__cur_cursor + 2
+
+    @cur_cursor.setter
+    def cur_cursor(self, value):
+        self.__cur_cursor = value - 2
 
     @property
     def win(self):
@@ -95,6 +105,9 @@ class MenuWindow(Window):
     def draw(self):
         self.update_item()
         self.win.clear()
+        max_y, max_x = self.win.getmaxyx()
+        self.win.addstr(0, ceil(max_x/2), f"{self.name}")
+        self.win.addstr(1, 0, "="*max_x)
         max_type_len = max([len(item.type_str) for item in self.items])
         max_prefix_len = max([len(item.prefix_str) for item in self.items])
         max_symbol_len = max([len(item.symbol_str) for item in self.items])
@@ -116,9 +129,9 @@ class MenuWindow(Window):
                 item_str += item.help_str
             #  highlight the chosen option
             if idx == self.cur_cursor:
-                self.win.addstr(idx, 0, item_str, curses.A_REVERSE+curses.color_pair(1))
+                self.win.addstr(idx+2, 0, item_str, curses.A_REVERSE+curses.color_pair(1))
             else:
-                self.win.addstr(idx, 0, item_str)
+                self.win.addstr(idx+2, 0, item_str)
 
     def down(self):
         if self.cur_cursor < len(self.items)-1:

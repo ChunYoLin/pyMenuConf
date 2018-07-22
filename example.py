@@ -6,7 +6,7 @@ from menuconfig.item import MenuItem, BoolItem, StringItem, EnumItem
 
 def main(stdscr):
     curses.curs_set(False)
-    main_window = MenuWindow(stdscr)
+    main_window = MenuWindow(stdscr, "Buying Option")
     main_window.add_item(BoolItem(symbol="buy", default=False, help_str="buy or not"))
     main_window.add_item(MenuItem(symbol="colors", options=["red", "blue", "green"], help_str="choose the colors"), depend_bool=["buy"])
     main_window.add_item(StringItem(symbol="location", default="your home address", help_str="set the shipping location"))
