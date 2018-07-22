@@ -147,22 +147,17 @@ class MenuWindow(Window):
         usage_y = max_y - 5
         self.win.addstr(usage_y, 0, " "*max_x, curses.A_REVERSE+curses.color_pair(1))
         self.win.addstr(usage_y, ceil(max_x/2)-3, "Usage", curses.A_REVERSE+curses.color_pair(1))
-        
-        offset_y = 1
-        pre_len = 0
-        for idx, usage in enumerate(self.usage):
-            if idx % 3 == 0 and idx != 0:
-                offset_y += 1
-                pre_len = 0
-            self.win.addstr(usage_y+offset_y, pre_len, usage)
-            pre_len += len(usage)+3
-
-    @property
-    def usage(self):
-        usage_list = []
-        for action in self.actions:
-            usage_list.append(action.usage)
-        return usage_list
+        offset_y = usage_y+1
+        for idx, action in enumerate(self.actions):
+            usage = action.usage
+            line_num = int(idx/3)
+            usage_num = idx%3*30
+            if line_num == 0:
+                self.win.addstr(line_num+offset_y, usage_num, usage)
+            if line_num == 1:
+                self.win.addstr(line_num+offset_y, usage_num, usage)
+            if line_num == 2:
+                self.win.addstr(line_num+offset_y, usage_num, usage)
 
     def main_loop(self):
         #  draw the menu
@@ -231,7 +226,7 @@ class InputAction(metaclass=abc.ABCMeta):
 class QuitAction(InputAction):
     @property
     def usage(self):
-        return "[q] exit or return to previous page"
+        return "[q] Exit/Back"
 
     @property
     def key(self):
@@ -243,7 +238,7 @@ class QuitAction(InputAction):
 class EnterAction(InputAction):
     @property
     def usage(self):
-        return "[ENTER] Toggle/Enter"
+        return "[Enter] Toggle/Enter"
 
     @property
     def key(self):
@@ -255,7 +250,7 @@ class EnterAction(InputAction):
 class ConfigAction(InputAction):
     @property
     def usage(self):
-        return "[c] Config the current setting"
+        return "[c] Configure"
 
     @property
     def key(self):
@@ -268,11 +263,11 @@ class ConfigAction(InputAction):
 class UpAction(InputAction):
     @property
     def usage(self):
-        return "[UP] Go Up"
+        return "[↑/j] Up"
 
     @property
     def key(self):
-        return (curses.KEY_UP, )
+        return (curses.KEY_UP, ord('k'),)
 
     def action(self, window, item):
         if window.cur_cursor > 0:
@@ -283,11 +278,11 @@ class UpAction(InputAction):
 class DownAction(InputAction):
     @property
     def usage(self):
-        return "[DOWN] Go Down"
+        return "[↓/k] Down"
 
     @property
     def key(self):
-        return (curses.KEY_DOWN, )
+        return (curses.KEY_DOWN, ord('j'),)
 
     def action(self, window, item):
         if window.cur_cursor < len(window.items)-1:
