@@ -112,7 +112,6 @@ class MenuWindow(Window):
     def draw(self):
         curses.init_pair(1, curses.COLOR_YELLOW, curses.COLOR_BLACK)
         self.win.bkgdset(" ", curses.A_BOLD)
-        self.update_item()
         self.win.clear()
         #  show the title string
         max_y, max_x = self.win.getmaxyx()
@@ -160,6 +159,8 @@ class MenuWindow(Window):
                 self.win.addstr(line_num+offset_y, usage_num, usage)
 
     def main_loop(self):
+        #  update item
+        self.update_item()
         #  draw the menu
         self.draw()
         #  process user input
@@ -206,9 +207,6 @@ class MenuWindow(Window):
                 return False
 
 class InputAction(metaclass=abc.ABCMeta):
-    def __init__(self):
-        pass
-
     @property
     @abc.abstractclassmethod
     def usage(self):
