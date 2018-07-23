@@ -34,6 +34,7 @@ class WindowManager():
                     if sub_window:
                         pre_window.append(cur_window)
                         cur_window = sub_window
+                        cur_window.set_prewin(pre_window[-1])
             elif status == Window.BACK:
                 if pre_window:
                     cur_window = pre_window.pop()

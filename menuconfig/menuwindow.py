@@ -116,6 +116,9 @@ class MenuWindow(Window):
         curses.init_pair(1, curses.COLOR_YELLOW, curses.COLOR_BLACK)
         self.win.bkgdset(" ", curses.A_BOLD)
         self.win.clear()
+        #  hint the user if there is prewin
+        if hasattr(self, "prewin"):
+            self.win.addstr(0, 0, "<- Back")
         #  show the title string
         max_y, max_x = self.win.getmaxyx()
         self.win.addstr(1, 0, " "*max_x, curses.A_REVERSE+curses.color_pair(1))
@@ -172,6 +175,9 @@ class MenuWindow(Window):
             if user_input in action.key:
                 cur_item = self.cur_item()
                 return action.action(self, cur_item)
+
+    def set_prewin(self, prewin):
+        self.prewin = prewin
 
     def get_all_values(self):
         value_dict = {}
