@@ -1,3 +1,5 @@
+import os
+os.environ.setdefault('ESCDELAY', '25')
 import re
 import abc
 import curses
@@ -221,20 +223,19 @@ class InputAction(metaclass=abc.ABCMeta):
     def action(self, window, item):
         pass
 
-class QuitAction(InputAction):
+class ExitAction(InputAction):
     @property
     def usage(self):
-        return "[q] Exit/Back"
+        return "[q/ESC] Exit"
 
     @property
     def key(self):
-        return (ord('q'), )
+        return (ord('q'), 27)
 
     def action(self, window, item):
-        if all([_item.config for _item in window.items]):
-            return Window.EXIT
+        return Window.EXIT
 
-class EnterAction(InputAction):
+class ToggleAction(InputAction):
     @property
     def usage(self):
         return "[Enter] Toggle/Enter"
@@ -245,6 +246,30 @@ class EnterAction(InputAction):
 
     def action(self, window, item):
         return item.toggle()
+
+class EnterAction(InputAction):
+    @property
+    def usage(self):
+        return "[->/l] Enter"
+
+    @property
+    def key(self):
+        return (ord('\n'), curses.KEY_RIGHT, ord('l'))
+
+    def action(self, window, item):
+        return Window.ENTER
+
+class BackAction(InputAction):
+    @property
+    def usage(self):
+        return "[<-/h] Back"
+
+    @property
+    def key(self):
+        return (ord('q'), curses.KEY_LEFT, ord('h'))
+
+    def action(self, window, item):
+        return Window.BACK
 
 class ConfigAction(InputAction):
     @property

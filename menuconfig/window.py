@@ -7,6 +7,7 @@ class Window(metaclass=abc.ABCMeta):
     ENTER = 1
     STAY = 2
     CONFIG = 3
+    BACK = 4
 
     def __init__(self):
         pass
@@ -26,15 +27,16 @@ class WindowManager():
         while True:
             status = cur_window.main_loop()
             if status == Window.EXIT:
+                break
+            elif status == Window.ENTER:
+                if hasattr(cur_window.cur_item(), "get_subwin"):
+                    sub_window = cur_window.cur_item().get_subwin()
+                    if sub_window:
+                        pre_window.append(cur_window)
+                        cur_window = sub_window
+            elif status == Window.BACK:
                 if pre_window:
                     cur_window = pre_window.pop()
-                else:
-                    break
-            elif status == Window.ENTER:
-                sub_window = cur_window.cur_item().get_subwin()
-                if sub_window:
-                    pre_window.append(cur_window)
-                    cur_window = sub_window
         curses.endwin()
 
     def get_all_values(self):
