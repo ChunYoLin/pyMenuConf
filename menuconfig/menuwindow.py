@@ -233,7 +233,8 @@ class QuitAction(InputAction):
         return (ord('q'), )
 
     def action(self, window, item):
-        return Window.EXIT
+        if all([_item.config for _item in window.items]):
+            return Window.EXIT
 
 class EnterAction(InputAction):
     @property
