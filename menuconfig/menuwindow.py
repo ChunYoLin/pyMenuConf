@@ -67,6 +67,12 @@ class MenuWindow(Window):
         self.__items.append(item)
         self.__item_symbols.append(item.symbol)
 
+    def remove_item(self, symbol):
+        if symbol in self.__item_symbols:
+            idx = self.__item_symbols.index(symbol)
+            del self.__items[idx]
+            del self.__item_symbols[idx]
+
     def add_callback(self, symbol, value, f, *fargs, **fkwargs):
         self.__callbacks[symbol] = (value, f, fargs, fkwargs)
 
