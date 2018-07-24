@@ -76,8 +76,7 @@ class ConfigAction(InputAction):
         return (ord('c'), )
 
     def action(self, window, item):
-        for item in window.items:
-            item.config = True
+        return Window.CONFIG
 
 class UpAction(InputAction):
     @property
@@ -93,6 +92,7 @@ class UpAction(InputAction):
             window.cur_cursor -= 1
         else:
             window.cur_cursor = 0
+        return Window.STAY
 
 class DownAction(InputAction):
     @property
@@ -108,3 +108,4 @@ class DownAction(InputAction):
             window.cur_cursor += 1
         else:
             window.cur_cursor = len(window.items)-1
+        return Window.STAY
