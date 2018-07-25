@@ -13,10 +13,4 @@ def main(stdscr):
     main_window.add_item(EnumItem(symbol="gift", allow_values=["100$", "beer"], default="beer", help_str="choose your gift"), depend_string=[("colors", ["blue", "red"])])
     wm = WindowManager(main_window)
     wm.run()
-    if wm.get_all_values()["buy"] == False:
-        main_window.remove_item("buy")
-        wm.run()
-    else:
-        pass
-
 wrapper(main)

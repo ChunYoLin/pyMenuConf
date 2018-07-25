@@ -38,6 +38,7 @@ class WindowManager():
             elif status == Window.CONFIG:
                 for item in cur_window.items:
                     item.config = True
+                break
             elif status == Window.BACK:
                 if pre_window:
                     cur_window = pre_window.pop()
