@@ -16,6 +16,7 @@ class Item(metaclass=abc.ABCMeta):
         self.__value = default
         self.__help_str = help_str
         self.__config = False
+        self.__callbacks = []
 
     @abc.abstractclassmethod
     def toggle(self):
@@ -50,6 +51,19 @@ class Item(metaclass=abc.ABCMeta):
     def value(self, value):
         self.__value = value
         self.config = False
+        self.check_callback(self.__value)
+
+    def add_callback(self, value, f, *fargs, **fkwargs):
+        self.__callbacks.append((value, f, fargs, fkwargs))
+
+    def check_callback(self, value):
+        for v, f, fargs, fkwargs in self.__callbacks:
+            if isinstance(v, list):
+                if value in v:
+                    f(*fargs, **fkwargs)
+            else:
+                if v == value:
+                    f(*fargs, **fkwargs)
 
     @property
     def config(self):

@@ -74,13 +74,14 @@ class MenuWindow(Window):
             del self.__item_symbols[idx]
 
     def cond(self, symbol, value, f, *fargs, **fkwargs):
-        self.__callbacks[symbol] = (value, f, fargs, fkwargs)
+        for item in self.items:
+            if item.symbol == symbol:
+                item.add_callback(value, f, *fargs, **fkwargs)
 
     def update_item(self):
         for item in self.__items:
             if item.depends:
                 self.check_item_depends(item)
-            self.check_cond(item)
         _unload = self.unload[:] 
         for line in _unload:
             if self.load_scons_line(line):
@@ -107,16 +108,6 @@ class MenuWindow(Window):
                         check.append(False)
         if check:
             check_item.valid = all(check)
-
-    def check_cond(self, item):
-        if item.symbol in self.__callbacks.keys():
-            value, f, fargs, fkwargs = self.__callbacks[item.symbol]
-            if isinstance(item.value, list):
-                if value in item.value:
-                    f(*fargs, **fkwargs)
-            else:
-                if item.value == value:
-                    f(*fargs, **fkwargs)
 
     def draw(self):
         curses.init_pair(1, curses.COLOR_YELLOW, curses.COLOR_BLACK)
