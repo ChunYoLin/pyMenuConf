@@ -21,11 +21,11 @@ class InputAction(metaclass=abc.ABCMeta):
 class ExitAction(InputAction):
     @property
     def usage(self):
-        return "[q/ESC] Exit"
+        return "[ESC] Exit"
 
     @property
     def key(self):
-        return (ord('q'), 27)
+        return (27,)
 
     def action(self, window, item):
         return Window.EXIT
@@ -57,7 +57,7 @@ class EnterAction(InputAction):
 class BackAction(InputAction):
     @property
     def usage(self):
-        return "[<-/h] Back"
+        return "[q/<-/h] Back"
 
     @property
     def key(self):
