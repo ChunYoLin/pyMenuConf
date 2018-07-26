@@ -53,17 +53,13 @@ class Item(metaclass=abc.ABCMeta):
         self.config = False
         self.check_callback(self.__value)
 
-    def add_callback(self, value, f, *fargs, **fkwargs):
-        self.__callbacks.append((value, f, fargs, fkwargs))
+    def add_callback(self, value, vfunc, f, *fargs, **fkwargs):
+        self.__callbacks.append((value, vfunc, f, fargs, fkwargs))
 
     def check_callback(self, value):
-        for v, f, fargs, fkwargs in self.__callbacks:
-            if isinstance(v, list):
-                if value in v:
-                    f(*fargs, **fkwargs)
-            else:
-                if v == value:
-                    f(*fargs, **fkwargs)
+        for v, vfunc, f, fargs, fkwargs in self.__callbacks:
+            if vfunc(value, v):
+                f(*fargs, **fkwargs)
 
     @property
     def config(self):
@@ -201,13 +197,6 @@ class MenuItem(SubwinItem):
     def value(self):
         return [item.symbol for item in self.subwin.items if item.value]
     
-    @value.setter
-    def value(self, value):
-        for item in self.subwin.items:
-            if item.symbol == value:
-                item.value = True
-
-    #  overwrite the value setter, must set the config property as well
     @property
     def config(self):
         return all([item.config for item in self.subwin.items])

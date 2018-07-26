@@ -73,10 +73,26 @@ class MenuWindow(Window):
             del self.__items[idx]
             del self.__item_symbols[idx]
 
-    def cond(self, symbol, value, f, *fargs, **fkwargs):
+    def __cond(self, symbol, value, vfunc, f, *fargs, **fkwargs):
         for item in self.items:
             if item.symbol == symbol:
-                item.add_callback(value, f, *fargs, **fkwargs)
+                item.add_callback(value, vfunc, f, *fargs, **fkwargs)
+
+    def equal_cond(self, symbol, value, f, *fargs, **fkwargs):
+        def vfunc(x, y):
+            if isinstance(y, list) and not isinstance(x, list):
+                return x in y
+            else:
+                return x == y
+        self.__cond(symbol, value, vfunc, f, *fargs, **fkwargs)
+        
+    def unequal_cond(self, symbol, value, f, *fargs, **fkwargs):
+        def vfunc(x, y):
+            if isinstance(y, list) and not isinstance(x, list):
+                return x not in y
+            else:
+                return x != y
+        self.__cond(symbol, value, vfunc, f, *fargs, **fkwargs)
 
     def update_item(self):
         for item in self.__items:
