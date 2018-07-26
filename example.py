@@ -18,4 +18,5 @@ def main(stdscr):
     main_window.unequal_cond("location", ["123", "456"], main_window.add_item, conditem1)
     wm = WindowManager(main_window)
     wm.run()
+    print(main_window["colors"])
 wrapper(main)

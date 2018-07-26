@@ -20,6 +20,13 @@ class MenuWindow(Window):
         self.unload = []
         self.init_action()
 
+    def __getitem__(self, symbol):
+        if symbol in self.__item_symbols:
+            idx = self.__item_symbols.index(symbol)
+            return self.__items[idx].value
+        else:
+            return None
+
     def init_action(self):
         self.actions = []
         for action in InputAction.__subclasses__():
