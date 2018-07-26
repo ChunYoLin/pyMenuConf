@@ -4,6 +4,7 @@ import abc
 import curses
 from math import ceil
 from curses import textpad
+from itertools import cycle
 
 import menuconfig
 from menuconfig import Window
@@ -137,19 +138,14 @@ class EnumItem(StringItem):
         super().__init__(symbol, default, help_str)
         if default:
             assert default in allow_values
-        self.__allow_values = [""] + allow_values
-        self._cur_value_idx = self.__allow_values.index(default)
+        self.allow_values = cycle([""] + allow_values)
 
     def toggle(self):
-        if self._cur_value_idx < len(self.__allow_values)-1:
-            self._cur_value_idx += 1
-        else:
-            self._cur_value_idx = 0
-        self.value = self.allow_values[self._cur_value_idx]
-
+        self.value = self.next_value
+    
     @property
-    def allow_values(self):
-        return self.__allow_values
+    def next_value(self):
+        return next(self.allow_values)
 
     @property 
     def type_str(self):
