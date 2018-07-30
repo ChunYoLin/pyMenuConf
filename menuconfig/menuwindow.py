@@ -65,18 +65,19 @@ class MenuWindow(Window):
             return None
 
     def add_item(self, item, depend_bool=None, depend_string=None):
-        item.valid = True
-        item.depends = {}
-        if depend_bool:
-            assert isinstance(depend_bool, list)
-            for depend_symbol in depend_bool:
-                item.depends[depend_symbol] = True
-        if depend_string:
-            assert isinstance(depend_string, list)
-            for depend_symbol, depend_val in depend_string:
-                item.depends[depend_symbol] = depend_val
-        self.__items.append(item)
-        self.__item_symbols.append(item.symbol)
+        if item.symbol not in self.__item_symbols:
+            item.valid = True
+            item.depends = {}
+            if depend_bool:
+                assert isinstance(depend_bool, list)
+                for depend_symbol in depend_bool:
+                    item.depends[depend_symbol] = True
+            if depend_string:
+                assert isinstance(depend_string, list)
+                for depend_symbol, depend_val in depend_string:
+                    item.depends[depend_symbol] = depend_val
+            self.__items.append(item)
+            self.__item_symbols.append(item.symbol)
 
     def remove_item(self, symbol):
         if symbol in self.__item_symbols:
@@ -224,25 +225,27 @@ class MenuWindow(Window):
                 if typename != "MenuItem":
                     pkitem = {typename: item}
                 else:
-                    pkitem = {typename: [item.symbol, item.value, [item.symbol for item in item.subwin.items], item.help_str]}
+                    pkitem = {typename: [item.symbol, item.value, [item.symbol for item in item.subwin.items], item.help_str, item.depends]}
                 pkout.append(pkitem)
             pickle.dump(pkout, out)
 
     def import_menu(self, filepath):
-        with open(filepath, "rb") as infile:
-            itemlist = pickle.load(infile)
-            for itemdict in itemlist:
-                for typename, item in itemdict.items():
-                    if typename == "MenuItem":
-                        symbol, value, options, help_str = item
-                        item = MenuItem(symbol=symbol, options=options, help_str=help_str)
-                        for it in item.subwin.items:
-                            if it.symbol in value:
-                                it.value = True
-                    item.config = False
-                    item.valid = True
-                    item.depends = {}
-                    self.__items.append(item)
+        if os.path.exists(filepath):
+            with open(filepath, "rb") as infile:
+                itemlist = pickle.load(infile)
+                for itemdict in itemlist:
+                    for typename, item in itemdict.items():
+                        if typename == "MenuItem":
+                            symbol, value, options, help_str, depends = item
+                            item = MenuItem(symbol=symbol, options=options, help_str=help_str)
+                            item.depends = depends
+                            for it in item.subwin.items:
+                                if it.symbol in value:
+                                    it.value = True
+                        item.config = False
+                        item.valid = True
+                        self.__items.append(item)
+                        self.__item_symbols.append(item.symbol)
 
     def load_scons_config_file(self, config_file):
         with open(config_file) as conf_file:

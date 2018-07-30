@@ -17,9 +17,10 @@ class Window(metaclass=abc.ABCMeta):
         pass
 
 class WindowManager():
-    def __init__(self, main_window):
+    def __init__(self, main_window, cachepath="menu.cache"):
         assert isinstance(main_window, Window)
         self.main_window = main_window
+        self.cachepath = cachepath
 
     def run(self):
         cur_window = self.main_window
@@ -38,7 +39,10 @@ class WindowManager():
             elif status == Window.CONFIG:
                 for item in cur_window.items:
                     item.config = True
-                break
+                for win in pre_window:
+                    for item in win.items:
+                        item.config = True
+                self.main_window.export_menu(self.cachepath)
             elif status == Window.BACK:
                 if pre_window:
                     cur_window = pre_window.pop()
