@@ -2,10 +2,14 @@ import os
 os.environ.setdefault('ESCDELAY', '25')
 import re
 import abc
+import copy
 import curses
+import pickle
 from math import ceil
+
 from menuconfig.window import Window
 from menuconfig.menuaction import InputAction
+from menuconfig.item import MenuItem
 
 
 class MenuWindow(Window):
@@ -207,6 +211,38 @@ class MenuWindow(Window):
     
     def get_all_config(self):
         return all([item.config for item in self.items])
+
+    def reset(self):
+        self.__items.clear()
+
+    def export_menu(self, filepath):
+        #TODO save dependency
+        with open(filepath, "wb") as out:
+            pkout = []
+            for item in self.items:
+                typename = type(item).__name__
+                if typename != "MenuItem":
+                    pkitem = {typename: item}
+                else:
+                    pkitem = {typename: [item.symbol, item.value, [item.symbol for item in item.subwin.items], item.help_str]}
+                pkout.append(pkitem)
+            pickle.dump(pkout, out)
+
+    def import_menu(self, filepath):
+        with open(filepath, "rb") as infile:
+            itemlist = pickle.load(infile)
+            for itemdict in itemlist:
+                for typename, item in itemdict.items():
+                    if typename == "MenuItem":
+                        symbol, value, options, help_str = item
+                        item = MenuItem(symbol=symbol, options=options, help_str=help_str)
+                        for it in item.subwin.items:
+                            if it.symbol in value:
+                                it.value = True
+                    item.config = False
+                    item.valid = True
+                    item.depends = {}
+                    self.__items.append(item)
 
     def load_scons_config_file(self, config_file):
         with open(config_file) as conf_file:
