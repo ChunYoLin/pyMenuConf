@@ -64,17 +64,13 @@ class MenuWindow(Window):
         else:
             return None
 
-    def add_item(self, item, depend_bool=None, depend_string=None):
+    def add_item(self, item, depends=None):
         if item.symbol not in self.__item_symbols:
             item.valid = True
             item.depends = {}
-            if depend_bool:
-                assert isinstance(depend_bool, list)
-                for depend_symbol in depend_bool:
-                    item.depends[depend_symbol] = True
-            if depend_string:
-                assert isinstance(depend_string, list)
-                for depend_symbol, depend_val in depend_string:
+            if depends:
+                assert isinstance(depends, list)
+                for depend_symbol, depend_val in depends:
                     item.depends[depend_symbol] = depend_val
             self.__items.append(item)
             self.__item_symbols.append(item.symbol)
@@ -134,6 +130,8 @@ class MenuWindow(Window):
                         check.append(True)
                     else:
                         check.append(False)
+            else:
+                check.append(False)
         if check:
             check_item.valid = all(check)
 
