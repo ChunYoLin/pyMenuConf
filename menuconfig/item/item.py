@@ -23,6 +23,14 @@ class Item(metaclass=abc.ABCMeta):
     def toggle(self):
         pass
 
+    @abc.abstractclassmethod
+    def toggle_right(self):
+        pass
+
+    @abc.abstractclassmethod
+    def toggle_left(self):
+        pass
+
     @property
     @abc.abstractclassmethod
     def prefix_str(self):
@@ -83,6 +91,12 @@ class BoolItem(Item):
     def toggle(self):
         self.value = not self.value
 
+    def toggle_right(self):
+        pass
+
+    def toggle_left(self):
+        pass
+
     @property 
     def prefix_str(self):
         return "[X]" if self.value else "[ ]"
@@ -123,6 +137,12 @@ class StringItem(Item):
                 win.addstr(text_start[0], text_start[1], value)
         curses.curs_set(0)
         curses.noecho()
+
+    def toggle_right(self):
+        pass
+
+    def toggle_left(self):
+        pass
         
     @property
     def prefix_str(self):
@@ -138,14 +158,27 @@ class EnumItem(StringItem):
         super().__init__(symbol, default, help_str)
         if default:
             assert default in allow_values
-        self.allow_values = cycle([""] + allow_values)
+        self.allow_values = [""] + allow_values
+        self.values_cycle = cycle(self.allow_values)
 
     def toggle(self):
         self.value = self.next_value
+
+    def toggle_right(self):
+        self.value = self.next_value
+
+    def toggle_left(self):
+        self.value = self.pre_value
     
     @property
     def next_value(self):
-        return next(self.allow_values)
+        return next(self.values_cycle)
+    
+    @property
+    def pre_value(self):
+        for i in range(len(self.allow_values)-1):
+            v = next(self.values_cycle)
+        return v
 
     @property 
     def type_str(self):
@@ -158,6 +191,12 @@ class SubwinItem(Item):
 
     def toggle(self):
         return Window.ENTER
+
+    def toggle_right(self):
+        return Window.ENTER
+    
+    def toggle_left(self):
+        pass
 
 class MenuItem(SubwinItem):
     def __init__(self, symbol, options=None, default=None, help_str=""):

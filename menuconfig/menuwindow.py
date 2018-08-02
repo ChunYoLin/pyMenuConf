@@ -215,7 +215,6 @@ class MenuWindow(Window):
         self.__items.clear()
 
     def export_menu(self, filepath):
-        #TODO save dependency
         with open(filepath, "wb") as out:
             pkout = []
             for item in self.items:

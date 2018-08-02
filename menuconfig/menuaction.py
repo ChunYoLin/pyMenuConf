@@ -30,7 +30,7 @@ class ExitAction(InputAction):
     def action(self, window, item):
         return Window.EXIT
 
-class ToggleAction(InputAction):
+class EnterAction(InputAction):
     @property
     def usage(self):
         return "[Enter] Toggle/Enter"
@@ -42,29 +42,33 @@ class ToggleAction(InputAction):
     def action(self, window, item):
         return item.toggle()
 
-class EnterAction(InputAction):
+class RightAction(InputAction):
     @property
     def usage(self):
-        return "[->/l] Enter"
+        return "[->/l] Enter/Next"
 
     @property
     def key(self):
-        return (ord('\n'), curses.KEY_RIGHT, ord('l'))
+        return (curses.KEY_RIGHT, ord('l'))
 
     def action(self, window, item):
-        return Window.ENTER
+        return item.toggle_right()
 
-class BackAction(InputAction):
+class ToggleLeftAction(InputAction):
     @property
     def usage(self):
-        return "[q/<-/h] Back"
+        return "[<-/h] Back/Pre"
 
     @property
     def key(self):
-        return (ord('q'), curses.KEY_LEFT, ord('h'))
+        return (curses.KEY_LEFT, ord('h'))
 
     def action(self, window, item):
-        return Window.BACK
+        item_ret = item.toggle_left()
+        if item_ret:
+            return item_ret
+        elif hasattr(window, "prewin"):
+            return Window.BACK
 
 class ConfigAction(InputAction):
     @property

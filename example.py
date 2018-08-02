@@ -8,7 +8,6 @@ def main(stdscr):
     curses.curs_set(False)
     main_window = MenuWindow(stdscr, "Buying Option")
     wm = WindowManager(main_window)
-    main_window.import_menu("menu.cache")
     main_window.add_item(BoolItem(symbol="buy", default=False, help_str="buy or not"))
     main_window.add_item(MenuItem(symbol="colors", options=["red", "blue", "green"], help_str="choose the colors"), depends=[("buy", True)])
     main_window.add_item(StringItem(symbol="location", default="your home address", help_str="set the shipping location"))
